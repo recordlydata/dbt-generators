@@ -1,0 +1,83 @@
+version: 2
+
+macros:
+  - name: generate_consumption_models
+    description: '{{ doc("macro_generate_consumption_models") }}'
+    arguments:
+      - name: from_schema_name
+        type: string
+        description: Required. Source schema on top whose tables to generate intermediate / publish models.
+      - name: table_name
+        type: string
+        description: Optional. Default=None. Generate model for just one table.
+      - name: table_prefix
+        type: string
+        description: Optional. Table prefix for searching source models.
+      - name: file_name_prefix
+        type: string
+        description: Optional. Defaults=''. Prefix to add to filename.sql in output.
+      - name: type
+        type: string
+        description: Default='int'. Other accepted values 'publish'. What type of sql to generate.
+
+  - name: generate_multiple_model_yaml
+    description: '{{ doc("macro_generate_multiple_model_yaml") }}'
+    arguments:
+      - name: table_prefix
+        type: string
+        description: Optional. Table prefix for searching tables.
+      - name: schema_pattern
+        type: string
+        description: Optional. Schema pattern for searching tables.
+      - name: add_pk_test
+        type: string
+        description: Optional. Default=False. Whether to add Primary Key tests and primary keys.
+      - name: source_table_prefix
+        type: string
+        description: Optional. Source table prefix as sources are named sources.yml
+      - name: source_name
+        type: string
+        description: Optional. Source name as defined in source.yml from which to search for PK columns
+
+  - name: generate_snapshot_sql
+    description: '{{ doc("macro_generate_snapshot_sql") }}'
+    arguments:
+      - name: source_name
+        type: string
+        description: Required. Source name as defined in sources.yml
+      - name: table_names
+        type: list
+        description: List of table names for which to generate snapshot sql.
+
+  - name: generate_snowflake_staging_sql
+    description: '{{ doc("macro_generate_snowflake_staging_sql") }}'
+    arguments:
+      - name: source_name
+        type: string
+        description: Required. Source name as defined in sources.yml
+      - name: table_names
+        type: list
+        description: List of table names for which to generate staging sql.
+
+  - name: generate_source_yaml_from_meta_table
+    description: '{{ doc("macro_generate_source_yaml_from_meta_table") }}'
+    arguments:
+      - name: source_system
+        type: string
+        description: Required. Source system name as defined in seed file. Used as a search term.
+      - name: ext_stage
+        type: string
+        description: Required. Default='ext_stg'. What to use as schema for external locations. Use the same value as in seed file for location.
+      - name: source_table
+        type: string
+        description: Optional. If building yaml for just one table. Used as a search term like source system.
+      - name: database_name
+        type: string
+        description: Optiona. Default=target.database. Use if sources are in a different database. Has no effect on external (datalake) sources.
+
+  - name: generate_commands
+    description: '{{ doc("generate_commands") }}'
+    arguments:
+      - name: source_system
+        type: string
+        description: Required. Source system name for which to generate commands to run.

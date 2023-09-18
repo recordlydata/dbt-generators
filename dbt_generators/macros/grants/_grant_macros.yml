@@ -1,0 +1,21 @@
+version: 2
+
+macros:
+  - name: env_specific_grant
+    description: '{{ doc("env_specific_grant") }}'
+    arguments:
+      - name: target_environment
+        type: string
+        description: Required. Target name that is used in dbt Cloud and in roles. Most probably dev/test/prod.
+      - name: role
+        type: string
+        description: Role to give grants to. "_ENV_" and "_ENV" are replaced with DBT_TARGET_ENV variable. 
+      - name: warehouse
+        type: string
+        description: Optional. Warehouse on which to give usage.
+      - name: grant
+        type: string
+        description: Optional. Default=select. Grant to give
+      - name: relation
+        type: string
+        description: Default=this. Relation to give grants on.
