@@ -10,42 +10,23 @@
 These commands generate the folders and empty place-holder files. Run in local project with git bash.
 ==================================================================================================
 cd $(git rev-parse --show-toplevel) &&
-mkdir models/{{source_name}}/ &&
-mkdir models/{{source_name}}/staging &&
-touch models/{{source_name}}/staging/_{{source_name}}__sources.yml &&
-touch models/{{source_name}}/staging/_{{source_name}}_stg__models.yml &&
-mkdir models/{{source_name}}/intermediate &&
-touch models/{{source_name}}/intermediate/_{{source_name}}_int__models.yml &&
-mkdir models/{{source_name}}/history &&
-touch models/{{source_name}}/history/_{{source_name}}_history__models.yml &&
-mkdir models/{{source_name}}/publish &&
-touch models/{{source_name}}/publish/_{{source_name}}_publish__models.yml &&
-mkdir snapshots/{{source_name}} &&
-mkdir seeds/control_tables/{{source_name}} &&
-touch seeds/control_tables/{{source_name}}/meta_{{source_name}}_control_table.csv
+mkdir models/staging/ &&
+mkdir models/staging/{{source_name}} &&
+touch models/staging/{{source_name}}/_{{source_name}}__sources.yml &&
+touch models/staging/{{source_name}}/_{{source_name}}_stg__models.yml &&
+mkdir snapshots/{{source_name}}
 
 ==================================================================================================
-COPY TO ALPHABETICAL ORDER in dbt_project.yml in MODELS AND SNAPSHOTS
+COPY TO dbt_project.yml MODELS AND SNAPSHOTS
 ==================================================================================================
 
 MODELS
-    # ------------------
-    # {{source_name}}
-    # ------------------
-    {{source_name}}:
-      +schema: {{source_name}}
+  ------THIS ENTRY PROBABLY EXISTS-------
+    staging:
+  ------COPY FROM HERE-------
       staging:
         +schema: {{source_name}}_stg
         +materialized: copy_into
-      intermediate:
-        +schema: {{source_name}}_int
-        +materialized: view
-      history:
-        +schema: {{source_name}}_history
-        +materialized: view
-        +post-hook: {%raw%}"{{ grant_usage('ROLE_DATASET_{%endraw%}{{source_name|upper}}{%raw%}_ENV_R', schema=schema) }}"{%endraw%}
-        +grants:
-          +select: {%raw%}["ROLE_DATASET_{%endraw%}{{source_name|upper}}{%raw%}_{{ env_var('DBT_TARGET_ENV') }}_R"]{%endraw%}
       publish:
         +transient: false
         +schema: {{source_name}}
@@ -59,36 +40,18 @@ SNAPSHOTS:
     # {{source_name}}
     # ------------------
     {{source_name}}:
-      +target_schema: dbt_cloud_{{source_name}}_snapshot
+      +target_schema: dbt_tpch_{{source_name}}_snapshot
 
 ==================================================================================================
 CREATE SOURCE YML DESCRIBING TABLES FOR DBT
 ==================================================================================================
 
 Run:
-dbt run-operation generate_source_yaml --args '{"meta_file": "meta_{{source_name}}_control_table", "source_system": "{{source_name}}"}'
+dbt run-operation generate_source --args '{"schema_name": "SOURCE_SCHEMA_NAME", "database_name": "SOURCE_DATABASE_NAME", "generate_columns": "true", "include_descriptions": "true", "include_data_types": "true", "name": "{{source_name}}", "include_database": "true", "include_schema": "true"}' > _{{source_name}}__sources.yml &&
+mv _{{source_name}}__sources.yml models/staging/{{source_name}}/_{{source_name}}__sources.yml
 
 Save as:
-models/{{source_name}}/staging/_{{source_name}}__sources.yml
-
-==================================================================================================
-CREATE SNOWFLAKE COPY INTO STAGING
-==================================================================================================
-
-Run:
-dbt run-operation generate_snowflake_staging_sql --args '{"source_name": "{{source_name}}"}'
-
-Save and split generated sql to models/{{source_name}}/staging/
-Run in git bash
-grep -vwP "\d\d:\d\d" ../../../log.sql | awk '/.sql/{out=$1;next} {print > out;}'
-
-Build Staging models:
-dbt build --select staging.{{source_name}}
-
-Create yaml contents:
-dbt run-operation generate_multiple_model_yaml --args '{"table_prefix": "{{source_name}}_stg__%"}'
-
-Copy to models/{{source_name}}/staging/_{{source_name}}__stg__models.yml
+models/staging/{{source_name}}/_{{source_name}}__sources.yml
 
 ==================================================================================================
 CREATE DBT SNAPSHOTS aka PERSISTENT STAGING WITH HISTORY

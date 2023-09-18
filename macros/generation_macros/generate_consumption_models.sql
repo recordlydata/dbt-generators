@@ -106,10 +106,12 @@
                 {{ '{{ dbt_utils.star(ref('~ "'" ~ source_table_name ~ "'" ~ '), except=["dbt_scd_id", "dbt_updated_at", "dbt_valid_from", "dbt_valid_to", "dbt_loaded_at"]) }}' }}
             {{ 'from {{ ref('~ "'" ~ source_table_name ~ "'" ~ ') }} '}}
             where dbt_valid_to is null
+            {% endif %}
             {% endset %}
             {{ log(base_model_sql, info=True) }}
+            
 
-        {% endfor %}
+    {% endfor %}
 
         {% if execute %}
 
