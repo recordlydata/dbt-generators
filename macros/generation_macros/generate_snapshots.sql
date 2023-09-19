@@ -13,7 +13,7 @@
             {% endif %}
 {% endfor %}
 
-{% set zsh_command_models = "source dbt_packages/generation_macros/bash_scripts/snapshot_creation.sh """~ source_name ~""" " %}
+{% set zsh_command_models = "source dbt_packages/dbt_generators/macros/generation_macros/bash_scripts/snapshot_creation.sh """~ source_name ~""" " %}
 
 {%- set models_array = [] -%}
 

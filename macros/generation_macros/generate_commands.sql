@@ -38,7 +38,7 @@ CREATE DBT SNAPSHOTS aka PERSISTENT STAGING WITH HISTORY
 ==================================================================================================
 
 Create persistent staging:
-dbt run-operation generate_snapshot_sql --args '{"source_name": "{{source_name}}"}'
+dbt run-operation generate_snapshots --args '{"source_name": "{{source_name}}"}'
 
 Run:
 dbt snapshot --select {{source_name}}
